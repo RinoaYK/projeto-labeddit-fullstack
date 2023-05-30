@@ -1,17 +1,3 @@
-#  - Lidia Yamamura - 
-### Veja o site: 
-Para facilitar o processo de deploy, foram criados repositórios separados para o frontend e o backend.
-
-- Frontend:
-	- [**Labeddit**](https://labeddit-lidia-yamamura.surge.sh/): https://labeddit-lidia-yamamura.surge.sh/
-
-- Backend:
-	- [**API Labeddit GitHub**](https://github.com/RinoaYK/projeto-labeddit-backend): https://github.com/RinoaYK/projeto-labeddit-backend
-
-	- [**Deploy API Labeddit**](https://projeto-labeddit-backend-ust7.onrender.com): https://projeto-labeddit-backend-ust7.onrender.com
-
-<br>
-
 # ![](https://raw.githubusercontent.com/RinoaYK/projeto-labeddit-fullstack/aaa012e084a09ccd694a4addec5bb452670fd4ec/src/images/Logo_menor.svg) Projeto Labeddit - fullstack
 Este é o repositório do **Labeddit**, um projeto final do bootcamp **FullStack Web da Labenu**. Ele consiste em duas partes separadas: o frontend ([**Labeddit**](https://labeddit-lidia-yamamura.surge.sh/)) e o backend ([**API Labeddit GitHub**](https://github.com/RinoaYK/projeto-labeddit-backend)).
 
@@ -22,6 +8,22 @@ Inspirado na rede social **Reddit**, o **Labeddit** permite aos usuários realiz
 O backend, por sua vez, é desenvolvido com **Node.js** e utiliza o framework **Express**. Ele fornece endpoints para manipulação de usuários, posts, comentários e interações, seguindo o conceito de **CRUD** (Create, Read, Update, Delete).
 
 Aproveite essa experiência final do bootcamp **FullStack Web da Labenu** com o **Labeddit**!
+
+
+#  - Lidia Yamamura - 
+Para facilitar o processo de deploy, foram criados repositórios separados para o frontend e o backend.
+
+### Projeto frontend Labeddit : 
+[**Labeddit deploy**](https://labeddit-lidia-yamamura.surge.sh/): https://labeddit-lidia-yamamura.surge.sh/
+
+
+### Veja a documentação: 
+[**API Labeddit deploy**](https://projeto-labeddit-backend-ust7.onrender.com):  https://projeto-labeddit-backend-ust7.onrender.com
+[**API Labeddit GitHub**](https://github.com/RinoaYK/projeto-labeddit-backend): https://github.com/RinoaYK/projeto-labeddit-backend
+[**API Labeddit documentação Postman**](https://documenter.getpostman.com/view/25826614/2s93m8zLhc): https://documenter.getpostman.com/view/25826614/2s93m8zLhc
+
+<br>
+
 
 ## **Tecnologias Utilizadas:**
 

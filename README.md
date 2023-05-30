@@ -12,7 +12,7 @@ Para facilitar o processo de deploy, foram criados repositórios separados para 
 
 <br>
 
-# Projeto Labeddit - fullstack
+# ![](https://raw.githubusercontent.com/RinoaYK/projeto-labeddit-fullstack/aaa012e084a09ccd694a4addec5bb452670fd4ec/src/images/Logo_menor.svg) Projeto Labeddit - fullstack
 Este é o repositório do **Labeddit**, um projeto final do bootcamp **FullStack Web da Labenu**. Ele consiste em duas partes separadas: o frontend ([**Labeddit**](https://labeddit-lidia-yamamura.surge.sh/)) e o backend ([**API Labeddit GitHub**](https://github.com/RinoaYK/projeto-labeddit-backend)).
 
 O frontend é uma aplicação **React.js** desenvolvida com o Design Systems -  [**Chakra**](https://chakra-ui.com/ "Chakra UI"), que segue o conceito de **Mobile First**, onde o foco principal é direcionado para dispositivos móveis. A partir disso, é feita a adaptação para telas maiores, como tablets e desktops. Você encontrará o design detalhado no [Figma](https://www.figma.com/file/Byakv89sjTqI6NG2NRAAKJ/Projeto-Integrador-Labeddit?node-id=0%3A1&t=haX9j5M0lHbjWnAr-0), fornecendo uma referência clara para o desenvolvimento.

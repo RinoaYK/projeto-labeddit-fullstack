@@ -37,7 +37,7 @@ const CardPost = ({
 }) => {
   const toast = useToast()
   const navigate = useNavigate()
-  const token = localStorage.getItem('token')
+  const token = Cookies.get('token')
   const headers = {
     headers: {
       Authorization: token
@@ -109,22 +109,23 @@ const CardPost = ({
 
   const [postsLikesDislikes, setPostsLikesDislikes] = useState([])
 
-  useEffect(() => {
-    const getPostsLikesDislikes = async () => {
-      const path2 = '/posts/likes/post'
-      try {
-        const response = await axios.get(`${baseURL}${path2}`, headers)
-        setPostsLikesDislikes(response.data)
-      } catch (error) {
-        toast({
-          title: error.response.data,
-          status: 'error',
-          isClosable: true,
-          position: 'top',
-          duration: 3500
-        })
-      }
+  const getPostsLikesDislikes = async () => {
+    const path2 = '/posts/likes/post'
+    try {
+      const response = await axios.get(`${baseURL}${path2}`, headers)
+      setPostsLikesDislikes(response.data)
+    } catch (error) {
+      toast({
+        title: error.response.data,
+        status: 'error',
+        isClosable: true,
+        position: 'top',
+        duration: 3500
+      })
     }
+  }
+
+  useEffect(() => {
     getPostsLikesDislikes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [findLikeUserAndPost])

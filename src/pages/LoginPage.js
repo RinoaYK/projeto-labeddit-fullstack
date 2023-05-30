@@ -46,8 +46,8 @@ function LoginPage () {
     event.preventDefault()
     Cookies.set('emailUserLabeddit', form.email, { expires: 7 })
 
-    if (rememberMe) {
-      localStorage.setItem('rememberMe', JSON.stringify(rememberMe))
+    if (rememberMe) {      
+      Cookies.set('rememberMe', JSON.stringify(rememberMe))
       Cookies.set('emailLabeddit', form.email, { expires: 7 })
       Cookies.set('passwordLabeddit', form.password, { expires: 7 })
     }
@@ -102,7 +102,7 @@ function LoginPage () {
   }
 
   useEffect(() => {
-    const storedValue = localStorage.getItem('rememberMe')
+    const storedValue = Cookies.get('rememberMe')
 
     if (storedValue) {
       setRememberMe(JSON.parse(storedValue))
@@ -217,7 +217,7 @@ function LoginPage () {
                       setRememberMe(false)
                       Cookies.remove('emailLabeddit')
                       Cookies.remove('passwordLabeddit')
-                      localStorage.removeItem('rememberMe')
+                      Cookies.remove('rememberMe')
                       setForm(prevForm => ({ ...prevForm, email: '' }))
                       setForm(prevForm => ({ ...prevForm, password: '' }))
                     }
@@ -296,13 +296,15 @@ function LoginPage () {
           </Flex>
         </Stack>
       ) : (
-        <Flex direction='column' align='center' gap='2em'>
+        <Flex direction='column' justifyContent='center'
+        alignItems='center' gap='2em' w='100vw'>
           <Text
             fontSize='38px'
             fontWeight='800'
             lineHeight='43px'
             fontFamily='ibm'
             color='#028FCC'
+            textAlign='center'
           >
             Logando, tenha paciência!
           </Text>

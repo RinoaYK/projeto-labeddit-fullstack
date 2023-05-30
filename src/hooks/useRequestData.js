@@ -4,6 +4,7 @@ import { baseURL } from '../constants/baseURL.js'
 import { goToPosts } from '../routes/coordinator'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useToast } from '@chakra-ui/react'
+import Cookies from 'js-cookie'
 
 export default function useRequestData (path, form) {
   const toast = useToast()
@@ -20,7 +21,7 @@ export default function useRequestData (path, form) {
     try {
       await axios.post(`${baseURL}${path}`, form).then(res => {
         if (isLogin || isSignup) {
-          localStorage.setItem('token', res.data.token)
+          Cookies.set('token', res.data.token)
         }
         setIsLoading(false)
         goToPosts(navigate)

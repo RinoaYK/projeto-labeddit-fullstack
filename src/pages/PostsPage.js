@@ -33,7 +33,7 @@ function PostsPage () {
   const toast = useToast()
   const path = '/posts'
   const navigate = useNavigate()
-  const token = localStorage.getItem('token')
+  const token = Cookies.get('token')
   const headers = {
     headers: {
       Authorization: token
@@ -240,7 +240,7 @@ function PostsPage () {
   const [order, setOrder] = useState('populares')
 
   const logout = () => {
-    localStorage.removeItem('token')
+    Cookies.remove('token')
     Cookies.remove('emailUserLabeddit')
     goToLogin(navigate)
   }

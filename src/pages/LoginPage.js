@@ -44,11 +44,10 @@ function LoginPage () {
 
   const handleClick = event => {
     event.preventDefault()
-    Cookies.set('emailUserLabeddit', form.email, { expires: 7 })
+    Cookies.set('emailLabeddit', form.email, { expires: 7 })
 
     if (rememberMe) {      
-      Cookies.set('rememberMe', JSON.stringify(rememberMe))
-      Cookies.set('emailLabeddit', form.email, { expires: 7 })
+      Cookies.set('rememberMe', JSON.stringify(rememberMe))      
       Cookies.set('passwordLabeddit', form.password, { expires: 7 })
     }
 
@@ -93,7 +92,7 @@ function LoginPage () {
         return
       }
     }
-    recebeDados()
+    recebeDados()    
   }
 
   const [showPassword, setShowPassword] = useState(false)

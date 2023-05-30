@@ -25,6 +25,7 @@ export default function useRequestData (path, form) {
         }
         setIsLoading(false)
         goToPosts(navigate)
+        window.location.reload();
       })
     } catch (error) {
       setIsLoading(false)

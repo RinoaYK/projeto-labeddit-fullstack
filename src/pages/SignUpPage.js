@@ -112,8 +112,8 @@ function SignUpPage () {
       return
     }
 
-    Cookies.set('emailUserLabeddit', form.email, { expires: 7 })
-    recebeDados()
+    Cookies.set('emailLabeddit', form.email, { expires: 7 })
+    recebeDados()    
   }
 
   const [showPassword, setShowPassword] = useState(false)

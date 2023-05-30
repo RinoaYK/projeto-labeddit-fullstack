@@ -5,10 +5,12 @@ import SignUpPage from "../pages/SignUpPage";
 import PostsPage from "../pages/PostsPage";
 import CommentsPage from "../pages/CommentsPage";
 import UserPage from "../pages/UserPage";
+import Header from "../components/HeaderComponent";
 
 function Router() {
   return (
-    <BrowserRouter>    
+    <BrowserRouter>   
+    <Header />
       <Routes>
       <Route path={"/comments/:id"} element={<CommentsPage />} />
         <Route path={"/posts"} element={<PostsPage />} />

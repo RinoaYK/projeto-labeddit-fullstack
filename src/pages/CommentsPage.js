@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import useProtectPage from '../hooks/useProtectPage'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { baseURL } from '../constants/baseURL'
 import {
@@ -8,8 +8,7 @@ import {
   Button,
   Divider,
   Flex,
-  FormControl,
-  Grid,
+  FormControl,  
   Heading,
   Icon,
   Image,
@@ -32,34 +31,31 @@ import { useForm } from '../hooks/useForm'
 import { HashLoader } from 'react-spinners'
 import { TbTrashX, TbTrashXFilled } from 'react-icons/tb'
 import { TfiPencil } from 'react-icons/tfi'
-import { goToLogin, goToPosts } from '../routes/coordinator'
+import { goToPosts } from '../routes/coordinator'
 import AlertDeletePost from '../components/AlertDeletePost'
 import errorReqImage from '../images/errorReq.gif'
 import ScrollIcons from '../components/ScrollIcons'
 import CardComment from '../components/CardComment'
-import Cookies from 'js-cookie'
-import logoM from '../../src/images/Logo_menor.svg'
-import buttonX from '../../src/images/buttonX.svg'
-import buttonXblue from '../../src/images/buttonXblue.svg'
+import { headers, useAuthorizationHeader } from '../hooks/useAuthorizationHeader'
+import { savedEmail } from '../constants/savedEmail'
+import { GlobalContext } from '../contexts/GlobalContext'
+import useDelete from '../hooks/useDelete'
 
 function CommentsPage () {
+  useAuthorizationHeader()
   const toast = useToast()
   const { id } = useParams()
   const navigate = useNavigate()
-  const token = Cookies.get('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
+  const {calculateDateDifference, media, showScrollIcons} = useContext(GlobalContext);
+    
   useProtectPage()
+
   const pathPost = '/posts'
 
   const [posts, setPosts] = useState([])
 
   const pathUsers = '/users'
-  const savedEmail = Cookies.get('emailUserLabeddit')
-
+  
   const [userId, setUserId] = useState('')
   const [users, setUsers] = useState([])
 
@@ -187,10 +183,6 @@ function CommentsPage () {
     )
   }
 
-  const media = (nPositivo, nNegativo) => {
-    return parseInt(nPositivo) - parseInt(nNegativo)
-  }
-
   const { form, onChangeForm, resetForm, setForm } = useForm({
     content: ''
   })
@@ -248,22 +240,10 @@ function CommentsPage () {
     )
   }
 
-  const deletePost = async (path, idToDelete) => {
-    try {
-      await axios.delete(`${baseURL}${path}/${idToDelete}`, headers)
-    } catch (error) {
-      toast({
-        title: error.response.data,
-        status: 'error',
-        isClosable: true,
-        position: 'top',
-        duration: 3500
-      })
-    }
-  }
+  const {deletePostComment} =  useDelete()
 
   const handleDeletePost = idToDelete => {
-    deletePost(pathPost, idToDelete)
+    deletePostComment(pathPost, idToDelete)    
     goToPosts(navigate)
   }
 
@@ -372,73 +352,11 @@ function CommentsPage () {
 
   const [editId, setEditId] = useState('')
 
-  const [showScrollIcons, setShowScrollIcons] = useState(false)
 
-  useEffect(() => {
-    function handleScroll () {
-      const scrollThreshold = 0
-      const scrollY = window.scrollY || window.pageYOffset
-      const windowHeight = window.innerHeight
-      const documentHeight = document.documentElement.scrollHeight
 
-      setShowScrollIcons(
-        scrollY > scrollThreshold && scrollY < documentHeight - windowHeight
-      )
-    }
+  
 
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
-
-  const calculateDateDifference = creationDate => {
-    const currentDate = new Date()
-    const parsedCreationDate = new Date(creationDate)
-
-    const timeDifference = currentDate.getTime() - parsedCreationDate.getTime()
-
-    const yearsDifference = Math.floor(
-      timeDifference / (1000 * 60 * 60 * 24 * 365)
-    )
-    if (yearsDifference > 0) {
-      return yearsDifference + (yearsDifference === 1 ? ' ano' : ' anos')
-    }
-
-    const monthsDifference = Math.floor(
-      timeDifference / (1000 * 60 * 60 * 24 * 30)
-    )
-    if (monthsDifference > 0) {
-      return monthsDifference + (monthsDifference === 1 ? ' mês' : ' meses')
-    }
-
-    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-    if (daysDifference > 0) {
-      const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60)) % 24
-      if (hoursDifference > 0) {
-        return (
-          daysDifference +
-          (daysDifference === 1 ? ' dia' : ' dias') +
-          ` e ${hoursDifference} horas`
-        )
-      } else {
-        return daysDifference + (daysDifference === 1 ? ' dia' : ' dias')
-      }
-    }
-
-    const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60))
-    if (hoursDifference > 0) {
-      return hoursDifference + (hoursDifference === 1 ? ' hora' : ' horas')
-    }
-
-    const minutesDifference = Math.floor(timeDifference / (1000 * 60))
-    if (minutesDifference > 0) {
-      return (
-        minutesDifference + (minutesDifference === 1 ? ' minuto' : ' minutos')
-      )
-    }
-    return 'Menos de um minuto'
-  }
+  const [postsLikesDislikes, setPostsLikesDislikes] = useState([])
 
   const findLikeUserAndPost = (userId, postId) => {
     const postLike = postsLikesDislikes.find(
@@ -446,106 +364,36 @@ function CommentsPage () {
     )
     return postLike ? postLike.like : null
   }
-
-  const [postsLikesDislikes, setPostsLikesDislikes] = useState([])
-
-  const getPostsLikesDislikes = async () => {
-    const path2 = '/posts/likes/post'
-    try {
-      const response = await axios.get(`${baseURL}${path2}`, headers)
-      setPostsLikesDislikes(response.data)
-    } catch (error) {
-      toast({
-        title: error.response.data,
-        status: 'error',
-        isClosable: true,
-        position: 'top',
-        duration: 3500
-      })
-    }  
-  }
-  
+ 
   useEffect(() => {   
+    const getPostsLikesDislikes = async () => {
+      const path2 = '/posts/likes/post'
+      try {
+        const response = await axios.get(`${baseURL}${path2}`, headers)
+        setPostsLikesDislikes(response.data)
+      } catch (error) {
+        toast({
+          title: error.response.data,
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 3500
+        })
+      }  
+    }
     getPostsLikesDislikes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findLikeUserAndPost])
+  }, [postsLikesDislikes])
 
   const [order, setOrder] = useState('populares')
-
-  const logout = () => {
-    Cookies.remove('token')
-    Cookies.remove('emailUserLabeddit')
-    goToLogin(navigate)
-  }
-
-  const [isHoveredDeleteIcon, setIsHoveredDeleteIcon] = useState(false)
-
+  
   return (
     <Flex
       minH={'100vh'}
       maxW={'100vw'}
       justifyContent='center'
       alignItems='center'
-    >
-      <Grid
-        position='absolute'
-        top='0em'
-        width='100vw'
-        align='center'
-        justify='center'
-        templateColumns='auto auto auto'
-        justifyContent='space-between'
-        alignItems='center'
-        height='50px'
-        bg='#EDEDED'
-        pl='1em'
-        pr='1em'
-      >
-        <Tooltip
-          label='voltar'
-          placement='right'
-          bg='#4088CB'
-          ml='0.2em'
-          hasArrow
-        >
-          <Image
-            gridColumn='1'
-            justifySelf='flex-start'
-            w={5}
-            h={5}
-            src={isHoveredDeleteIcon ? buttonXblue : buttonX}
-            _hover={{
-              cursor: 'pointer'
-            }}
-            onMouseEnter={() => setIsHoveredDeleteIcon(true)}
-            onMouseLeave={() => setIsHoveredDeleteIcon(false)}
-            onClick={() => {
-              goToPosts(navigate)
-              setIsHoveredDeleteIcon(false)
-            }}
-          />
-        </Tooltip>
-
-        <Image src={logoM} gridColumn='2' justifySelf='center' ml={'3em'} />
-        <Button
-          bg='none'
-          _hover={{
-            bg: 'transparent',
-            fontWeight: '700'
-          }}
-          fontSize='18px'
-          fontWeight='600'
-          lineHeight='25px'
-          fontFamily='noto'
-          color='#4088CB'
-          gridColumn='3'
-          justifySelf='flex-end'
-          onClick={logout}
-          zIndex='docked'
-        >
-          Logout
-        </Button>
-      </Grid>
+    >   
 
       {showScrollIcons && <ScrollIcons />}
 
@@ -560,7 +408,7 @@ function CommentsPage () {
             direction='column'
             minH='100vh'
           >
-            {postId && !isEditPost ? (
+            {postId && postsLikesDislikes && !isEditPost ? (
               <Flex
                 mt='5em'
                 alignItems='flex-start'
@@ -976,8 +824,7 @@ function CommentsPage () {
                 !isEditComment && editId !== comment.id ? (
                   <CardComment
                     key={comment.id}
-                    comment={comment}
-                    calculateDateDifference={calculateDateDifference}
+                    comment={comment}                    
                     setIsEditEnabledComment={setIsEditEnabledComment}
                     isEditEnabledComment={isEditEnabledComment}
                     setIsEditComment={setIsEditComment}
@@ -992,11 +839,9 @@ function CommentsPage () {
                     handleMouseEnterArrowUp={handleMouseEnterArrowUp}
                     handleMouseLeaveArrowUp={handleMouseLeaveArrowUp}
                     likeOrDeslike={likeOrDeslike}
-                    media={media}
                     hoveredImagesArrowDown={hoveredImagesArrowDown}
                     handleMouseEnterArrowDown={handleMouseEnterArrowDown}
-                    handleMouseLeaveArrowDown={handleMouseLeaveArrowDown}
-                    deletePost={deletePost}
+                    handleMouseLeaveArrowDown={handleMouseLeaveArrowDown}                    
                   />
                 ) : editId === comment.id ? (
                   <Flex
@@ -1064,8 +909,7 @@ function CommentsPage () {
                   </Flex>
                 ) : (
                   <CardComment
-                    comment={comment}
-                    calculateDateDifference={calculateDateDifference}
+                    comment={comment}                    
                     setIsEditEnabledComment={setIsEditEnabledComment}
                     isEditEnabledComment={isEditEnabledComment}
                     setIsEditComment={setIsEditComment}
@@ -1080,11 +924,9 @@ function CommentsPage () {
                     handleMouseEnterArrowUp={handleMouseEnterArrowUp}
                     handleMouseLeaveArrowUp={handleMouseLeaveArrowUp}
                     likeOrDeslike={likeOrDeslike}
-                    media={media}
                     hoveredImagesArrowDown={hoveredImagesArrowDown}
                     handleMouseEnterArrowDown={handleMouseEnterArrowDown}
-                    handleMouseLeaveArrowDown={handleMouseLeaveArrowDown}
-                    deletePost={deletePost}
+                    handleMouseLeaveArrowDown={handleMouseLeaveArrowDown}                    
                   />
                 )
               )}

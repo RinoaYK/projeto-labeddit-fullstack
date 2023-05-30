@@ -1,9 +1,7 @@
 import {
-  Box,
   Button,
   Flex,
-  FormControl,
-  Grid,
+  FormControl,  
   Heading,
   Icon,
   Image,
@@ -11,8 +9,7 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  Text,
-  Tooltip,
+  Text,  
   chakra,
   useToast
 } from '@chakra-ui/react'
@@ -26,22 +23,17 @@ import { baseURL } from '../constants/baseURL'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { motion } from 'framer-motion'
-import { goToEditUser, goToPosts } from '../routes/coordinator'
+import { goToEditUser } from '../routes/coordinator'
 import errorReqImage from '../images/errorReq.gif'
-import logoM from '../../src/images/Logo_menor.svg'
-import buttonX from '../../src/images/buttonX.svg'
-import buttonXblue from '../../src/images/buttonXblue.svg'
+import { headers, useAuthorizationHeader } from '../hooks/useAuthorizationHeader'
+import { savedEmail } from '../constants/savedEmail'
 
 function UserPage () {
+  useAuthorizationHeader()
   const navigate = useNavigate()
   const AnimatedButton = chakra(motion.button)
   const toast = useToast()
-  const token = Cookies.get('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
+
   useProtectPage()
   const [error, setError] = useState(false)
   const [errorReq, setErrorReq] = useState(false)
@@ -53,15 +45,17 @@ function UserPage () {
     password: '',
     avatar: ''
   })
-  const path = '/users'
-  const savedEmail = Cookies.get('emailUserLabeddit')
+  const path = '/users'  
 
   const [userAvatar, setUserAvatar] = useState('')
   const [userId, setUserId] = useState('')
   const [userNickname, setUserNickname] = useState(null)
   const [users, setUsers] = useState([])
 
+  const [loadingFindUser, setLoadingFindUser] = useState(false)
+
   const findUser = async () => {
+    setLoadingFindUser(true)
     try {
       const response = await axios.get(`${baseURL}${path}`, headers)
       const filteredData = response.data.filter(obj => obj.email === savedEmail)
@@ -70,6 +64,7 @@ function UserPage () {
         setUserNickname(filteredData[0].nickname)
         setUserAvatar(filteredData[0].avatar)
         setUserId(filteredData[0].id)
+        setLoadingFindUser(false)
       }
     } catch (error) {
       toast({
@@ -86,8 +81,7 @@ function UserPage () {
     setIsLoading(true)
     try {
       await axios.put(`${baseURL}${path}/${userId}`, form, headers)
-      setIsLoading(false)
-      window.location.reload()
+      setIsLoading(false)      
     } catch (error) {
       setErrorReq(true)
     }
@@ -159,6 +153,7 @@ function UserPage () {
         setForm(prevForm => ({ ...prevForm, email: '' }))
         return
       }
+      Cookies.set('emailLabeddit', form.email, { expires: 7 })
     }
 
     if (form.password !== '') {
@@ -199,15 +194,17 @@ function UserPage () {
       }
     }
 
-    editUser(formData)
+    if (Object.keys(formData).length === 0) {
+      return
+    } 
+
+    editUser(formData)            
   }
 
   useEffect(() => {
     findUser()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const [isHoveredDeleteIcon, setIsHoveredDeleteIcon] = useState(false)
 
   return (
     <Flex
@@ -216,51 +213,7 @@ function UserPage () {
       justifyContent='center'
       alignItems='center'
     >
-      <Grid
-        position='absolute'
-        top='0em'
-        width='100vw'
-        align='center'
-        justify='center'
-        templateColumns='auto auto auto'
-        justifyContent='space-between'
-        alignItems='center'
-        height='50px'
-        bg='#EDEDED'
-        pl='1em'
-        pr='1em'
-      >
-        <Tooltip
-          label='voltar'
-          placement='right'
-          bg='#4088CB'
-          ml='0.2em'
-          hasArrow
-        >
-          <Image
-            gridColumn='1'
-            justifySelf='flex-start'
-            w={5}
-            h={5}
-            src={isHoveredDeleteIcon ? buttonXblue : buttonX}
-            _hover={{
-              cursor: 'pointer'
-            }}
-            onMouseEnter={() => setIsHoveredDeleteIcon(true)}
-            onMouseLeave={() => setIsHoveredDeleteIcon(false)}
-            onClick={() => {
-              goToPosts(navigate)
-              setIsHoveredDeleteIcon(false)
-            }}
-          />
-        </Tooltip>
-
-        <Image src={logoM} gridColumn='2' justifySelf='center' ml={'6em'} />
-
-        <Box w='7em' gridColumn='3' justifySelf='flex-start' />
-      </Grid>
-
-      {!errorReq ? (
+     {!errorReq ? (
         !isLoading ? (
           <Flex
             direction='column'
@@ -291,7 +244,7 @@ function UserPage () {
                 <Input
                   fontFamily='noto'
                   htmlFor='nickname'
-                  placeholder={userNickname}
+                  placeholder={loadingFindUser? 'loading...': userNickname}
                   id='nickname'
                   isRequired
                   name={'nickname'}
@@ -355,7 +308,7 @@ function UserPage () {
                   mt='1em'
                   fontFamily='noto'
                   htmlFor='avatar'
-                  placeholder={userAvatar}
+                  placeholder={loadingFindUser? 'loading...': userAvatar}
                   type='text'
                   id='avatar'
                   isRequired

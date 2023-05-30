@@ -82,6 +82,7 @@ function UserPage () {
     try {
       await axios.put(`${baseURL}${path}/${userId}`, form, headers)
       setIsLoading(false)      
+      window.location.reload();
     } catch (error) {
       setErrorReq(true)
     }
@@ -198,7 +199,7 @@ function UserPage () {
       return
     } 
 
-    editUser(formData)            
+    editUser(formData)                
   }
 
   useEffect(() => {

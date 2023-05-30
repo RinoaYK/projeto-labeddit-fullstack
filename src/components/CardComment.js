@@ -47,7 +47,7 @@ const CardComment = ({
   deletePost
 }) => {
   const toast = useToast()
-  const token = localStorage.getItem('token')
+  const token = Cookies.get('token')
   const headers = {
     headers: {
       Authorization: token
@@ -115,23 +115,24 @@ const CardComment = ({
 
   const [commentsLikesDislikes, setCommentsLikesDislikes] = useState([])
 
-  useEffect(() => {
-    const getPostsLikesDislikes = async () => {
-      const path2 = '/comments/likes/comment'
-      try {
-        const response = await axios.get(`${baseURL}${path2}`, headers)
-        setCommentsLikesDislikes(response.data)
-      } catch (error) {
-        toast({
-          title: error.response.data,
-          status: 'error',
-          isClosable: true,
-          position: 'top',
-          duration: 3500
-        })
-      }
+  const getCommentsLikesDislikes = async () => {
+    const path2 = '/comments/likes/comment'
+    try {
+      const response = await axios.get(`${baseURL}${path2}`, headers)
+      setCommentsLikesDislikes(response.data)
+    } catch (error) {
+      toast({
+        title: error.response.data,
+        status: 'error',
+        isClosable: true,
+        position: 'top',
+        duration: 3500
+      })
     }
-    getPostsLikesDislikes()
+  }
+
+  useEffect(() => {    
+    getCommentsLikesDislikes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [findLikeUserAndComment])
 

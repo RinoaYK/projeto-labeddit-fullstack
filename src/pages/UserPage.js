@@ -36,7 +36,7 @@ function UserPage () {
   const navigate = useNavigate()
   const AnimatedButton = chakra(motion.button)
   const toast = useToast()
-  const token = localStorage.getItem('token')
+  const token = Cookies.get('token')
   const headers = {
     headers: {
       Authorization: token
@@ -255,7 +255,7 @@ function UserPage () {
           />
         </Tooltip>
 
-        <Image src={logoM} gridColumn='2' justifySelf='center' ml={'3em'} />
+        <Image src={logoM} gridColumn='2' justifySelf='center' ml={'6em'} />
 
         <Box w='7em' gridColumn='3' justifySelf='flex-start' />
       </Grid>

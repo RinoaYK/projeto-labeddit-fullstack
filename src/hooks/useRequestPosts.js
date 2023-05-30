@@ -2,12 +2,13 @@ import { useState } from 'react'
 import axios from 'axios'
 import { baseURL } from '../constants/baseURL.js'
 import { useToast } from '@chakra-ui/react'
+import Cookies from 'js-cookie'
 
 export default function useRequestPosts (path, form) {  
   const toast = useToast()
   const [error, setError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const token = localStorage.getItem('token')
+  const token = Cookies.get('token')
   const headers = {
     headers: {
       Authorization: token

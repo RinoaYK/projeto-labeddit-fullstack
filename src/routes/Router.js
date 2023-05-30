@@ -3,14 +3,12 @@ import ErrorPage from "../pages/ErrorPage";
 import LoginPage from "../pages/LoginPage";
 import SignUpPage from "../pages/SignUpPage";
 import PostsPage from "../pages/PostsPage";
-import Header from '../components/header'
 import CommentsPage from "../pages/CommentsPage";
 import UserPage from "../pages/UserPage";
 
 function Router() {
   return (
-    <BrowserRouter>
-    {/* <Header /> */}
+    <BrowserRouter>    
       <Routes>
       <Route path={"/comments/:id"} element={<CommentsPage />} />
         <Route path={"/posts"} element={<PostsPage />} />

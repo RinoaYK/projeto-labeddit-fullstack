@@ -47,13 +47,12 @@ ________________________________________________________________
 	- Contém 1 página de erro que é redirecionado caso ocorra um erro.		
 	- O projeto segue o [design](https://www.figma.com/file/Byakv89sjTqI6NG2NRAAKJ/Projeto-Integrador-Labeddit?node-id=0%3A1&t=haX9j5M0lHbjWnAr-0 "design") proposto;	
 	
-	<br>
+
 - **Página Login:**
 	- Página principal onde é possível o usuário logar na aplicação.
 	-É possível selecionar o checkbox "Remeber Me" para salvar os dados de login. Se retirar o check, os dados  são removidos.
 	-  Possui um botão  para logar e um botão para ir para a página de Cadastro.
 	- **Atenção!!** Para logar, o usuário precisa ter se cadastratado.
-<br>
 
 - **Página Cadastro:**
 	- Nessa página o usúario pode realizar o cadastro.
@@ -61,7 +60,7 @@ ________________________________________________________________
 		- nickname, email e senha.
 	- Contém um botão para efetuar o cadastro e um para voltar pro  login.
 	- Possui verificação, caso não preencha com campos válidos.
-<br>
+
 - **Página de Posts:**
 	- No Header, contém um botão a esquerda onde é  possível ver o avatar e nickname do usuário e leva para a página de edição de usuário.
 	- A direita no Header, contém um botão para o sair da conta.
@@ -72,7 +71,8 @@ ________________________________________________________________
 	- É possível curtir ou descurtir um post, mas não é possível nos que você mesmo criou.
 	- Em cada card de post, no ícone de mensagem ao lado das setas de curtidas, onde é visualizado a quantidade de comentários, é possível ir para os comentários relacionados àquele post.
 	- **Atenção!!** Se você deletar um post, todos os comments relacionados serão excluídos automaticamente.
-	<br>
+
+
 - **Página de Comments:**
 	- No Header, contém um botão a esquerda que fecha os comentários e volta para os posts.
 	- A direita no Header, contém um botão para o sair da conta.
@@ -82,14 +82,12 @@ ________________________________________________________________
 	- É possível curtir ou descurtir um comment ou post, mas não é possível nos que você mesmo criou.
 	- Contém cards com os comments dos usuários do post selecionado, é possível editar ou deletar o comment ou post que você mesmo criou.
 	- **Atenção!!** Se você deletar um post, todos os comments relacionados serão excluídos automaticamente.
-<br>
 
 - **Página User:**
 	- Nessa página é possível alterar as informações do usuário cadastrado:
 		- nickname, email, senha ou avatar.
 	-  Contém um botão a esquerda no Header para fechar a edição e voltar a página de posts.
 	- **Atenção!!** No input avatar, ao se cadastrar, inicia com uma imagem default de usuário, para ser alterado, deve ser colocado um link de imagem válido.
-<br>
 
 - **Página de Erro:**
 	- Contém um botão para retornar ao Login;
@@ -97,7 +95,7 @@ ________________________________________________________________
 
 ## O layout da página:
 
-![](https://github.com/RinoaYK/projeto-react-apis/blob/main/Pokedex.gif)
+![]()
 
 ### Instalação:
 

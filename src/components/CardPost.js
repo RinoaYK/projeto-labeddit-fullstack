@@ -18,10 +18,12 @@ import arrowDown from '../images/arrowDown.svg'
 import arrowDownColorFull from '../images/arrowDownColorFull.svg'
 import arrowDownColor from '../images/arrowDownColor.svg'
 import commentIcon from '../images/commentIcon.svg'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { baseURL } from '../constants/baseURL'
-import Cookies from 'js-cookie'
+import { headers } from '../hooks/useAuthorizationHeader'
+import { savedEmail } from '../constants/savedEmail'
+import { GlobalContext } from '../contexts/GlobalContext'
 
 const CardPost = ({
   post,
@@ -32,20 +34,14 @@ const CardPost = ({
   setHoveredImagesTrashIcon,
   hoveredImagesTrashIcon,
   onOpen,
-  getPosts,
-  media
+  setPosts
 }) => {
   const toast = useToast()
   const navigate = useNavigate()
-  const token = Cookies.get('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
+  const {calculateDateDifference, media} = useContext(GlobalContext);
 
   const path = '/users'
-  const savedEmail = Cookies.get('emailUserLabeddit')
+  const pathPosts = '/posts'
 
   const [userId, setUserId] = useState('')
   const [users, setUsers] = useState([])
@@ -89,7 +85,8 @@ const CardPost = ({
     }
     try {
       await axios.put(`${baseURL}${path2}`, body, headers)
-      getPosts()
+      const response = await axios.get(`${baseURL}${pathPosts}`, headers)
+      setPosts(response.data)      
     } catch (error) {
       toast({
         title: error.response.data,
@@ -100,6 +97,9 @@ const CardPost = ({
       })
     }
   }
+
+  const [postsLikesDislikes, setPostsLikesDislikes] = useState([])
+
   const findLikeUserAndPost = (userId, postId) => {
     const postLike = postsLikesDislikes.find(
       postLD => postLD.userId === userId && postLD.postId === postId
@@ -107,28 +107,25 @@ const CardPost = ({
     return postLike ? postLike.like : null
   }
 
-  const [postsLikesDislikes, setPostsLikesDislikes] = useState([])
-
-  const getPostsLikesDislikes = async () => {
-    const path2 = '/posts/likes/post'
-    try {
-      const response = await axios.get(`${baseURL}${path2}`, headers)
-      setPostsLikesDislikes(response.data)
-    } catch (error) {
-      toast({
-        title: error.response.data,
-        status: 'error',
-        isClosable: true,
-        position: 'top',
-        duration: 3500
-      })
-    }
-  }
-
   useEffect(() => {
+    const getPostsLikesDislikes = async () => {
+      const path2 = '/posts/likes/post'
+      try {
+        const response = await axios.get(`${baseURL}${path2}`, headers)
+        setPostsLikesDislikes(response.data)
+      } catch (error) {
+        toast({
+          title: error.response.data,
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 3500
+        })
+      }
+    }
     getPostsLikesDislikes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findLikeUserAndPost])
+  }, [postsLikesDislikes])
 
   const [comments, setComments] = useState([])
 
@@ -197,55 +194,6 @@ const CardPost = ({
     )
   }
 
-  const calculateDateDifference = creationDate => {
-    const currentDate = new Date()
-    const parsedCreationDate = new Date(creationDate)
-
-    const timeDifference = currentDate.getTime() - parsedCreationDate.getTime()
-
-    const yearsDifference = Math.floor(
-      timeDifference / (1000 * 60 * 60 * 24 * 365)
-    )
-    if (yearsDifference > 0) {
-      return yearsDifference + (yearsDifference === 1 ? ' ano' : ' anos')
-    }
-
-    const monthsDifference = Math.floor(
-      timeDifference / (1000 * 60 * 60 * 24 * 30)
-    )
-    if (monthsDifference > 0) {
-      return monthsDifference + (monthsDifference === 1 ? ' mês' : ' meses')
-    }
-
-    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-    if (daysDifference > 0) {
-      const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60)) % 24
-      if (hoursDifference > 0) {
-        return (
-          daysDifference +
-          (daysDifference === 1 ? ' dia' : ' dias') +
-          ` e ${hoursDifference} horas`
-        )
-      } else {
-        return daysDifference + (daysDifference === 1 ? ' dia' : ' dias')
-      }
-    }
-
-    const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60))
-    if (hoursDifference > 0) {
-      return hoursDifference + (hoursDifference === 1 ? ' hora' : ' horas')
-    }
-
-    const minutesDifference = Math.floor(timeDifference / (1000 * 60))
-    if (minutesDifference > 0) {
-      return (
-        minutesDifference + (minutesDifference === 1 ? ' minuto' : ' minutos')
-      )
-    }
-
-    return 'Menos de um minuto'
-  }
-
   return (
     <Flex
       justifyContent='space-between'
@@ -255,7 +203,7 @@ const CardPost = ({
       flexDirection='column'
       alignItems='flex-start'
     >
-      {post && (
+      {post && postsLikesDislikes && (
         <Flex justifyContent='space-between' w='100%'>
           <Flex
             direction='row'

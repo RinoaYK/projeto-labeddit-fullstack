@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { goToEditUser, goToLogin, goToPosts } from '../routes/coordinator'
+import { goToEditUser, goToPosts } from '../routes/coordinator'
 import useProtectPage from '../hooks/useProtectPage'
 import { useForm } from '../hooks/useForm'
 import {
@@ -16,8 +16,7 @@ import {
   Divider,
   useToast,
   Select,
-  Grid,
-  Tooltip
+  Tooltip,
 } from '@chakra-ui/react'
 import { HashLoader } from 'react-spinners'
 import { baseURL } from '../constants/baseURL.js'
@@ -26,26 +25,29 @@ import AlertDeletePost from '../components/AlertDeletePost'
 import errorReqImage from '../images/errorReq.gif'
 import ScrollIcons from '../components/ScrollIcons'
 import CardPost from '../components/CardPost'
-import Cookies from 'js-cookie'
-import logoM from '../../src/images/Logo_menor.svg'
+import {
+  headers,
+  useAuthorizationHeader
+} from '../hooks/useAuthorizationHeader'
+import { savedEmail } from '../constants/savedEmail'
+import { GlobalContext } from '../contexts/GlobalContext'
+import useDelete from '../hooks/useDelete'
 
 function PostsPage () {
+  useAuthorizationHeader()
   const toast = useToast()
   const path = '/posts'
   const navigate = useNavigate()
-  const token = Cookies.get('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
+  const { media, showScrollIcons } = useContext(GlobalContext)
+
   useProtectPage()
-  const savedEmail = Cookies.get('emailUserLabeddit')
 
   const [userAvatar, setUserAvatar] = useState('')
   const [userId, setUserId] = useState('')
   const [userNickname, setUserNickname] = useState(null)
   const pathUser = '/users'
+
+  // requisições
 
   const findUser = async () => {
     try {
@@ -73,10 +75,6 @@ function PostsPage () {
   }, [])
 
   const [posts, setPosts] = useState([])
-
-  const media = (nPositivo, nNegativo) => {
-    return parseInt(nPositivo) - parseInt(nNegativo)
-  }
 
   const getPosts = async () => {
     try {
@@ -138,19 +136,7 @@ function PostsPage () {
     resetForm()
   }
 
-  const deletePost = async idToDelete => {
-    try {
-      await axios.delete(`${baseURL}${path}/${idToDelete}`, headers)
-    } catch (error) {
-      toast({
-        title: error.response.data,
-        status: 'error',
-        isClosable: true,
-        position: 'top',
-        duration: 3500
-      })
-    }
-  }
+  const { deletePostComment } = useDelete()
 
   const [hoveredImagesTrashIcon, setHoveredImagesTrashIcon] = useState([])
 
@@ -159,7 +145,7 @@ function PostsPage () {
 
   const handleDeletePost = () => {
     if (hoveredImagesTrashIcon[0]) {
-      deletePost(hoveredImagesTrashIcon[0])
+      deletePostComment(path, hoveredImagesTrashIcon[0])
     }
     setHoveredImagesTrashIcon([])
     onClose()
@@ -205,6 +191,7 @@ function PostsPage () {
       prevHoveredImages.filter(id => id !== postId)
     )
     setIsEditEnabled(true)
+    getPosts()
   }
 
   const editarButton = () => {
@@ -213,37 +200,12 @@ function PostsPage () {
     } else {
       return 'Editar'
     }
+    
   }
 
   const [isEditEnabled, setIsEditEnabled] = useState(true)
 
-  const [showScrollIcons, setShowScrollIcons] = useState(false)
-
-  useEffect(() => {
-    function handleScroll () {
-      const scrollThreshold = 0
-      const scrollY = window.scrollY || window.pageYOffset
-      const windowHeight = window.innerHeight
-      const documentHeight = document.documentElement.scrollHeight
-
-      setShowScrollIcons(
-        scrollY > scrollThreshold && scrollY < documentHeight - windowHeight
-      )
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
-
   const [order, setOrder] = useState('populares')
-
-  const logout = () => {
-    Cookies.remove('token')
-    Cookies.remove('emailUserLabeddit')
-    goToLogin(navigate)
-  }
 
   return (
     <Flex
@@ -252,74 +214,41 @@ function PostsPage () {
       justifyContent='center'
       alignItems='center'
     >
-      <Grid
-        position='absolute'
-        top='0em'
-        width='100vw'
-        align='center'
-        justify='center'
-        templateColumns='auto auto auto'
-        justifyContent='space-between'
-        alignItems='center'
-        height='50px'
-        bg='#EDEDED'
-        pl='1em'
-        pr='1em'
+      <Tooltip
+        label='Editar usuário'
+        placement='right'
+        bg='#FF7264'
+        ml='0.2em'
+        hasArrow
       >
-        <Tooltip
-          label='Editar usuário'
-          placement='right'
-          bg='#FF7264'
-          ml='0.2em'
-          hasArrow
-        >
-          <Flex
-            direction='row'
-            alignItems='center'
-            justifyContent='center'
-            gap='0.5em'
-            onClick={() => goToEditUser(navigate)}
-            _hover={{
-              cursor: 'pointer',
-              fontWeight: '800'
-            }}
-            fontWeight='500'
-            rounded={10}
-            zIndex={'docked'}
-          >
-            <Image
-              src={userAvatar}
-              boxSize='35px'
-              borderRadius='50%'
-              bg='white'
-            />
-            <Text fontSize='15px' lineHeight='25px' fontFamily='noto'>
-              {userNickname}
-            </Text>
-          </Flex>
-        </Tooltip>
-
-        <Image src={logoM} gridColumn='2' justifySelf='center' />
-
-        <Button
-          bg='none'
+        <Flex
+          position='absolute'
+          top='0.5em'
+          left='1em'
+          direction='row'
+          alignItems='center'
+          justifyContent='center'
+          gap='0.5em'
+          onClick={() => goToEditUser(navigate)}
           _hover={{
-            bg: 'transparent',
-            fontWeight: '700'
+            cursor: 'pointer',
+            fontWeight: '800'
           }}
-          fontSize='18px'
-          fontWeight='600'
-          lineHeight='25px'
-          fontFamily='noto'
-          color='#4088CB'
-          gridColumn='3'
-          justifySelf='flex-end'
-          onClick={logout}
-          zIndex='docked'
+          fontWeight='500'
+          rounded={10}
+          zIndex={'docked'}
         >
-          Logout
-        </Button>
-      </Grid>
+          <Image
+            src={userAvatar}
+            boxSize='35px'
+            borderRadius='50%'
+            bg='white'
+          />
+          <Text fontSize='15px' lineHeight='25px' fontFamily='noto'>
+            {userNickname}
+          </Text>
+        </Flex>
+      </Tooltip>
 
       {showScrollIcons && <ScrollIcons />}
 
@@ -509,8 +438,7 @@ function PostsPage () {
                             }
                             hoveredImagesTrashIcon={hoveredImagesTrashIcon}
                             onOpen={onOpen}
-                            getPosts={getPosts}
-                            media={media}
+                            setPosts={setPosts}
                           />
                         )}
                       </>
@@ -524,8 +452,7 @@ function PostsPage () {
                         setHoveredImagesTrashIcon={setHoveredImagesTrashIcon}
                         hoveredImagesTrashIcon={hoveredImagesTrashIcon}
                         onOpen={onOpen}
-                        getPosts={getPosts}
-                        media={media}
+                        setPosts={setPosts}
                       />
                     )}
                   </Flex>

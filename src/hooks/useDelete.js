@@ -1,20 +1,16 @@
 import axios from 'axios'
 import { baseURL } from '../constants/baseURL.js'
 import { useToast } from '@chakra-ui/react'
-import Cookies from 'js-cookie'
+import { headers, useAuthorizationHeader } from './useAuthorizationHeader.js'
 
-export default function useDelete (path, idToDelete) {
+export default function useDelete () {
   const toast = useToast()
-  const token = Cookies.getItem('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
-  const deletePostComment = async () => {
+  useAuthorizationHeader()
+
+  const deletePostComment = async (path, idToDelete) => {    
     try {
-      await axios.delete(`${baseURL}${path}/${idToDelete}`, headers)
-    } catch (error) {
+      await axios.delete(`${baseURL}${path}/${idToDelete}`, headers)    
+    } catch (error) {    
       toast({
         title: error.response.data,
         status: 'error',
@@ -25,5 +21,5 @@ export default function useDelete (path, idToDelete) {
     }
   }
 
-  return deletePostComment
+  return {deletePostComment}
 }

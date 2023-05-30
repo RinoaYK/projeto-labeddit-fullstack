@@ -11,7 +11,7 @@ import {
 import { TbTrashX, TbTrashXFilled } from 'react-icons/tb'
 import { TfiPencil } from 'react-icons/tfi'
 import AlertDeleteComment from './AlertDeleteComment'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import React from 'react'
 import arrowUp from '../images/arrowUp.svg'
 import arrowUpColorFull from '../images/arrowUpColorFull.svg'
@@ -21,11 +21,13 @@ import arrowDownColorFull from '../images/arrowDownColorFull.svg'
 import arrowDownColor from '../images/arrowDownColor.svg'
 import axios from 'axios'
 import { baseURL } from '../constants/baseURL'
-import Cookies from 'js-cookie'
+import { headers, useAuthorizationHeader } from '../hooks/useAuthorizationHeader'
+import { savedEmail } from '../constants/savedEmail'
+import { GlobalContext } from '../contexts/GlobalContext'
+import useDelete from '../hooks/useDelete'
 
 const CardComment = ({
-  comment,
-  calculateDateDifference,
+  comment,  
   setIsEditEnabledComment,
   isEditEnabledComment,
   setIsEditComment,
@@ -39,23 +41,15 @@ const CardComment = ({
   hoveredImagesArrowUp,
   handleMouseEnterArrowUp,
   handleMouseLeaveArrowUp,
-  likeOrDeslike,
-  media,
+  likeOrDeslike,  
   hoveredImagesArrowDown,
   handleMouseEnterArrowDown,
-  handleMouseLeaveArrowDown,
-  deletePost
+  handleMouseLeaveArrowDown,  
 }) => {
+  useAuthorizationHeader()
   const toast = useToast()
-  const token = Cookies.get('token')
-  const headers = {
-    headers: {
-      Authorization: token
-    }
-  }
-
-  const pathUsers = '/users'
-  const savedEmail = Cookies.get('emailUserLabeddit')
+  const {calculateDateDifference, media} = useContext(GlobalContext);
+  const pathUsers = '/users'  
 
   const [userId, setUserId] = useState('')
   const [users, setUsers] = useState([])
@@ -91,11 +85,12 @@ const CardComment = ({
     }
     return null
   }
+  const {deletePostComment} =  useDelete()
 
   const [selectedCommentId, setSelectedCommentId] = useState(null)
   const handleDeleteComment = idToDelete => {
     setIsEditEnabled(true)
-    deletePost('/comments', idToDelete)
+    deletePostComment('/comments', idToDelete)
   }
   const cancelRefComment = React.useRef()
 
@@ -105,6 +100,8 @@ const CardComment = ({
     onClose: onCloseComment
   } = useDisclosure()
 
+  const [commentsLikesDislikes, setCommentsLikesDislikes] = useState([])
+
   const findLikeUserAndComment = (userId, commentId) => {
     const commentLike = commentsLikesDislikes.find(
       commentLD =>
@@ -113,30 +110,28 @@ const CardComment = ({
     return commentLike ? commentLike.like : null
   }
 
-  const [commentsLikesDislikes, setCommentsLikesDislikes] = useState([])
-
-  const getCommentsLikesDislikes = async () => {
-    const path2 = '/comments/likes/comment'
-    try {
-      const response = await axios.get(`${baseURL}${path2}`, headers)
-      setCommentsLikesDislikes(response.data)
-    } catch (error) {
-      toast({
-        title: error.response.data,
-        status: 'error',
-        isClosable: true,
-        position: 'top',
-        duration: 3500
-      })
-    }
-  }
-
   useEffect(() => {    
+    const getCommentsLikesDislikes = async () => {
+      const path2 = '/comments/likes/comment'
+      try {
+        const response = await axios.get(`${baseURL}${path2}`, headers)
+        setCommentsLikesDislikes(response.data)
+      } catch (error) {
+        toast({
+          title: error.response.data,
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 3500
+        })
+      }
+    }
+
     getCommentsLikesDislikes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findLikeUserAndComment])
+  }, [commentsLikesDislikes])
 
-  return (
+  return (    
     <Flex
       alignItems='flex-start'
       padding='9px 10px'
@@ -150,6 +145,7 @@ const CardComment = ({
       key={comment.id}
       mb='1em'
     >
+      {commentsLikesDislikes &&
       <Flex justifyContent='space-between' w='100%'>
         <Flex
           direction='row'
@@ -289,7 +285,7 @@ const CardComment = ({
             </Tooltip>
           </Flex>
         ) : null}
-      </Flex>
+      </Flex>}
       <Text fontFamily='ibm' fontSize='18px' fontWeight='400' lineHeight='23px'>
         {comment.content}
       </Text>

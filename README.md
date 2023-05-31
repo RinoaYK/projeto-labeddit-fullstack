@@ -97,7 +97,7 @@ ________________________________________________________________
 
 ## O layout da página:
 
-![]()
+![](https://raw.githubusercontent.com/RinoaYK/projeto-labeddit-fullstack/main/Labeddit-frontend.gif)
 
 ### Instalação:
 

@@ -29,6 +29,7 @@ Para facilitar o processo de deploy, foram criados repositórios separados para 
 
 - React
 - React Router
+- React Context
 - Framer Motion
 - Criação de hooks
 - Integração de APIs - Axios
